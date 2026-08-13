@@ -116,7 +116,7 @@ Voxel connectivity definition.
 **2D connectivity**
 
 - `4`
-- `8`
+- `8` (recommended for conservative topological consistency)
 
 **3D connectivity**
 
