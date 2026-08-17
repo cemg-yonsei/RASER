@@ -1,7 +1,8 @@
 # RASER (Recursive Aggregate Segmentation by Erosion and Reconstitution)
 
-![tps://img.shields.io/badge/License-MIT-yellow.svg
-https://img.shields.io/badge/Language-MATLAB-blue.svg
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Language: MATLAB](https://img.shields.io/badge/Language-MATLAB-blue.svg)
+![Version](https://img.shields.io/badge/version-v1.0-green.svg)
 
 ## 📌 Overview
 
