@@ -10,6 +10,34 @@
 
 ---
 
+## 🔬 How RASER Works
+
+RASER starts from a binary image in which the particle phase has already been identified. The segmentation proceeds as follows:
+
+1. **Connected-component identification**  
+   Initial particles and fused clusters are identified according to the user-defined voxel connectivity.
+
+2. **Size-based classification**  
+   Detected objects are divided into **coarse** and **small** particles using the threshold `d_min`. Small particles are retained without further erosion, while coarse particles are passed to the erosion–reconstitution process.
+
+3. **Surface erosion**  
+   At the current erosion depth, surface voxels are removed layer by layer. The indices of all removed voxels are stored so that the original particle volume can later be reconstructed.
+
+4. **Particle-core identification**  
+   After erosion, newly separated connected components are identified as individual particle cores.
+
+5. **Surface reconstitution**  
+   Removed voxel layers are restored in reverse order (Last-In, First-Out). Voxels are reassigned to neighboring particle cores according to the selected connectivity.
+
+6. **Interface conflict resolution**  
+   If a removed voxel is adjacent to multiple particles, RASER resolves the competing assignments deterministically to maintain unique particle labels.
+
+7. **Iterative convergence**  
+   Steps 2–6 are repeated at the same erosion depth until the number of identified particles no longer changes.
+
+8. **Recursive convergence**  
+   The erosion depth is then increased by one voxel and the iterative process is repeated. RASER terminates when increasing the erosion depth produces no additional particle separation.
+
 ## 📁 Repository Structure & Function Reference
 
 The source code is modularized into specialized functions to ensure transparency and reproducibility.
@@ -116,22 +144,29 @@ Voxel connectivity definition.
 
 **2D connectivity**
 
-- `4`
-- `8` (recommended for conservative topological consistency)
+- `4`  = edge-connected neighbors
+- `8`  = edge- and corner-connected neighbors
 
 **3D connectivity**
 
-- `6`
-- `18`
-- `26` (recommended for conservative topological consistency)
+- `6`  = edge-connected neighbors
+- `18`  = face- and edge-connected neighbors
+- `26`  = face-, edge-, and corner-connected neighbors
 
 #### `d_min`
 
-Minimum particle diameter threshold.
+Minimum characteristic particle-size threshold used for computational filtering.
 
-- Particles with diameter ≥ `d_min` are processed through the recursive segmentation procedure.
-- Smaller particles are preserved without recursive processing.
-- Set
+RASER classifies detected particles into:
+
+- **Coarse particles**: passed to the iterative erosion–reconstitution process.
+- **Small particles**: retained without further erosion.
+
+For 3D images, the characteristic size is defined using the intermediate principal-axis length obtained from `regionprops3`. For 2D images, the minor-axis length obtained from `regionprops` is used.
+
+`d_min` primarily controls which particles require further processing and does **not** determine the erosion depth used for segmentation. The erosion depth is automatically determined by the recursive convergence procedure.
+
+Setting
 
 ```matlab
 d_min = 1;
